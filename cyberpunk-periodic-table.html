@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyberpunk Periodic Table</title>
+<style>
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0a0e27;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 65, 0.03) 2px, rgba(0, 255, 65, 0.03) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0, 255, 65, 0.03) 2px, rgba(0, 255, 65, 0.03) 4px);
+  font-family: 'Courier New', monospace;
+  overflow-x: auto;
+  padding: 20px;
+  min-height: 100vh;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 255, 65, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.container {
+  max-width: 1800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+h1 {
+  text-align: center;
+  color: #00ff41;
+  font-size: 2.5em;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 8px;
+  text-shadow:
+    0 0 10px #00ff41,
+    0 0 20px #00ff41,
+    0 0 30px #00ff41,
+    0 0 40px #00ff41,
+    0 0 70px #00ff41;
+  animation: flicker 3s infinite alternate;
+  position: relative;
+}
+
+h1::before {
+  content: '◢◤◢◤';
+  position: absolute;
+  left: -60px;
+  color: #00ff41;
+  animation: rotate 2s linear infinite;
+}
+
+h1::after {
+  content: '◥◣◥◣';
+  position: absolute;
+  right: -60px;
+  color: #00ff41;
+  animation: rotate 2s linear infinite reverse;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes flicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% {
+    text-shadow:
+      0 0 10px #00ff41,
+      0 0 20px #00ff41,
+      0 0 30px #00ff41,
+      0 0 40px #00ff41,
+      0 0 70px #00ff41;
+  }
+  20%, 24%, 55% {
+    text-shadow: none;
+  }
+}
+
+.subtitle {
+  text-align: center;
+  color: #0f9;
+  font-size: 0.9em;
+  margin-bottom: 30px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.periodic-table {
+  display: grid;
+  grid-template-columns: repeat(18, 1fr);
+  gap: 4px;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.element {
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, rgba(0, 20, 40, 0.9) 0%, rgba(0, 40, 60, 0.9) 100%);
+  border: 1px solid #00ff41;
+  border-radius: 4px;
+  padding: 8px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 10px rgba(0, 255, 65, 0.2),
+    0 0 5px rgba(0, 255, 65, 0.3);
+}
+
+.element::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(0, 255, 65, 0.1), transparent);
+  transform: rotate(0deg);
+  transition: transform 0.6s;
+}
+
+.element:hover::before {
+  transform: rotate(180deg);
+}
+
+.element::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00ff41, transparent);
+  transform: translateX(-100%);
+  transition: transform 0.5s;
+}
+
+.element:hover::after {
+  transform: translateX(100%);
+}
+
+.element:hover {
+  transform: translateY(-5px) scale(1.05);
+  border-color: #0ff;
+  box-shadow:
+    inset 0 0 20px rgba(0, 255, 255, 0.4),
+    0 0 20px rgba(0, 255, 65, 0.6),
+    0 0 30px rgba(0, 255, 65, 0.4),
+    0 5px 15px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(135deg, rgba(0, 40, 60, 0.95) 0%, rgba(0, 60, 80, 0.95) 100%);
+  z-index: 10;
+}
+
+.atomic-number {
+  font-size: 0.65em;
+  color: #0ff;
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  font-weight: bold;
+  text-shadow: 0 0 5px #0ff;
+}
+
+.symbol {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #00ff41;
+  text-align: center;
+  margin-top: 12px;
+  text-shadow:
+    0 0 10px #00ff41,
+    0 0 20px #00ff41;
+  letter-spacing: 1px;
+}
+
+.name {
+  font-size: 0.5em;
+  color: #0f9;
+  text-align: center;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.9;
+}
+
+.atomic-mass {
+  font-size: 0.55em;
+  color: #0cf;
+  text-align: center;
+  margin-top: 2px;
+  opacity: 0.8;
+}
+
+.empty {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  cursor: default;
+}
+
+.empty:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.lanthanides,
+.actinides {
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  gap: 4px;
+  margin-top: 15px;
+}
+
+.series-label {
+  grid-column: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00ff41;
+  font-weight: bold;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 0.8em;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px #00ff41;
+  border: 1px solid #00ff41;
+  border-radius: 4px;
+  background: linear-gradient(135deg, rgba(0, 20, 40, 0.6) 0%, rgba(0, 40, 60, 0.6) 100%);
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.7);
+  background: linear-gradient(135deg, rgba(10, 25, 47, 0.98) 0%, rgba(15, 35, 60, 0.98) 100%);
+  border: 2px solid #00ff41;
+  border-radius: 12px;
+  padding: 30px;
+  z-index: 1000;
+  max-width: 500px;
+  width: 90%;
+  box-shadow:
+    inset 0 0 30px rgba(0, 255, 65, 0.2),
+    0 0 50px rgba(0, 255, 65, 0.5),
+    0 0 100px rgba(0, 255, 65, 0.3);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal.active {
+  display: block;
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.modal::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #00ff41, #0ff, #00ff41, #0ff);
+  border-radius: 12px;
+  z-index: -1;
+  animation: borderRotate 3s linear infinite;
+  opacity: 0.5;
+}
+
+@keyframes borderRotate {
+  from { filter: hue-rotate(0deg); }
+  to { filter: hue-rotate(360deg); }
+}
+
+.modal-header {
+  text-align: center;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.modal-symbol {
+  font-size: 4em;
+  color: #00ff41;
+  font-weight: bold;
+  text-shadow:
+    0 0 20px #00ff41,
+    0 0 40px #00ff41,
+    0 0 60px #00ff41;
+  margin-bottom: 10px;
+  animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% {
+    text-shadow:
+      0 0 20px #00ff41,
+      0 0 40px #00ff41,
+      0 0 60px #00ff41;
+  }
+  50% {
+    text-shadow:
+      0 0 30px #00ff41,
+      0 0 60px #00ff41,
+      0 0 90px #00ff41;
+  }
+}
+
+.modal-name {
+  font-size: 1.5em;
+  color: #0ff;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 5px;
+}
+
+.modal-number {
+  font-size: 1em;
+  color: #0f9;
+  opacity: 0.8;
+}
+
+.modal-content {
+  color: #0f9;
+  line-height: 1.8;
+}
+
+.modal-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.info-item {
+  background: rgba(0, 255, 65, 0.05);
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 255, 65, 0.3);
+  transition: all 0.3s;
+}
+
+.info-item:hover {
+  background: rgba(0, 255, 65, 0.1);
+  border-color: #00ff41;
+  box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+}
+
+.info-label {
+  font-size: 0.75em;
+  color: #0cf;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+  opacity: 0.8;
+}
+
+.info-value {
+  font-size: 1em;
+  color: #00ff41;
+  font-weight: bold;
+  text-shadow: 0 0 5px #00ff41;
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: transparent;
+  border: 2px solid #00ff41;
+  color: #00ff41;
+  font-size: 1.5em;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+}
+
+.close-btn:hover {
+  background: #00ff41;
+  color: #0a0e27;
+  transform: rotate(90deg);
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.6);
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.overlay.active {
+  display: block;
+  opacity: 1;
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+  padding: 20px;
+  background: rgba(0, 20, 40, 0.6);
+  border: 1px solid #00ff41;
+  border-radius: 8px;
+  box-shadow: inset 0 0 20px rgba(0, 255, 65, 0.1);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #0f9;
+  font-size: 0.85em;
+}
+
+.legend-box {
+  width: 30px;
+  height: 30px;
+  border: 2px solid #00ff41;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+}
+
+.metal { background: linear-gradient(135deg, rgba(0, 100, 200, 0.3), rgba(0, 150, 255, 0.3)); }
+.nonmetal { background: linear-gradient(135deg, rgba(200, 0, 100, 0.3), rgba(255, 0, 150, 0.3)); }
+.metalloid { background: linear-gradient(135deg, rgba(100, 200, 0, 0.3), rgba(150, 255, 0, 0.3)); }
+.noble { background: linear-gradient(135deg, rgba(200, 100, 0, 0.3), rgba(255, 150, 0, 0.3)); }
+
+@media (max-width: 1400px) {
+  .periodic-table {
+    grid-template-columns: repeat(18, minmax(50px, 1fr));
+  }
+
+  .symbol {
+    font-size: 1.2em;
+  }
+
+  .name, .atomic-mass {
+    font-size: 0.45em;
+  }
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.5em;
+    letter-spacing: 3px;
+  }
+
+  h1::before,
+  h1::after {
+    display: none;
+  }
+
+  .periodic-table {
+    grid-template-columns: repeat(18, minmax(40px, 1fr));
+    gap: 2px;
+  }
+
+  .element {
+    padding: 4px;
+  }
+
+  .symbol {
+    font-size: 0.9em;
+    margin-top: 8px;
+  }
+
+  .name {
+    display: none;
+  }
+
+  .atomic-mass {
+    font-size: 0.4em;
+  }
+}
+
+.scanline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 255, 65, 0.03),
+    rgba(0, 255, 65, 0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 9999;
+  animation: scan 8s linear infinite;
+}
+
+@keyframes scan {
+  from { transform: translateY(0); }
+  to { transform: translateY(10px); }
+}
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+  <h1>CYBERPUNK PERIODIC TABLE</h1>
+  <div class="subtitle">◢ Interactive Periodic Table of Elements ◣</div>
+
+  <div class="periodic-table" id="periodicTable"></div>
+
+  <div class="lanthanides">
+    <div class="series-label">LANTHANIDES</div>
+  </div>
+
+  <div class="actinides">
+    <div class="series-label">ACTINIDES</div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-box metal"></div>
+      <span>Metals</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-box nonmetal"></div>
+      <span>Non-metals</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-box metalloid"></div>
+      <span>Metalloids</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-box noble"></div>
+      <span>Noble Gases</span>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<div class="modal" id="modal">
+  <button class="close-btn" onclick="closeModal()">×</button>
+  <div class="modal-header">
+    <div class="modal-symbol" id="modalSymbol"></div>
+    <div class="modal-name" id="modalName"></div>
+    <div class="modal-number" id="modalNumber"></div>
+  </div>
+  <div class="modal-content">
+    <div class="modal-info" id="modalInfo"></div>
+  </div>
+</div>
+
+<script>
+const elements = [
+  {num: 1, symbol: 'H', name: 'Hydrogen', mass: '1.008', type: 'nonmetal', col: 1, row: 1, electron: '1', state: 'gas', discovery: '1766'},
+  {num: 2, symbol: 'He', name: 'Helium', mass: '4.003', type: 'noble', col: 18, row: 1, electron: '2', state: 'gas', discovery: '1868'},
+  {num: 3, symbol: 'Li', name: 'Lithium', mass: '6.941', type: 'metal', col: 1, row: 2, electron: '2,1', state: 'solid', discovery: '1817'},
+  {num: 4, symbol: 'Be', name: 'Beryllium', mass: '9.012', type: 'metal', col: 2, row: 2, electron: '2,2', state: 'solid', discovery: '1798'},
+  {num: 5, symbol: 'B', name: 'Boron', mass: '10.81', type: 'metalloid', col: 13, row: 2, electron: '2,3', state: 'solid', discovery: '1808'},
+  {num: 6, symbol: 'C', name: 'Carbon', mass: '12.01', type: 'nonmetal', col: 14, row: 2, electron: '2,4', state: 'solid', discovery: 'ancient'},
+  {num: 7, symbol: 'N', name: 'Nitrogen', mass: '14.01', type: 'nonmetal', col: 15, row: 2, electron: '2,5', state: 'gas', discovery: '1772'},
+  {num: 8, symbol: 'O', name: 'Oxygen', mass: '16.00', type: 'nonmetal', col: 16, row: 2, electron: '2,6', state: 'gas', discovery: '1774'},
+  {num: 9, symbol: 'F', name: 'Fluorine', mass: '19.00', type: 'nonmetal', col: 17, row: 2, electron: '2,7', state: 'gas', discovery: '1886'},
+  {num: 10, symbol: 'Ne', name: 'Neon', mass: '20.18', type: 'noble', col: 18, row: 2, electron: '2,8', state: 'gas', discovery: '1898'},
+  {num: 11, symbol: 'Na', name: 'Sodium', mass: '22.99', type: 'metal', col: 1, row: 3, electron: '2,8,1', state: 'solid', discovery: '1807'},
+  {num: 12, symbol: 'Mg', name: 'Magnesium', mass: '24.31', type: 'metal', col: 2, row: 3, electron: '2,8,2', state: 'solid', discovery: '1808'},
+  {num: 13, symbol: 'Al', name: 'Aluminum', mass: '26.98', type: 'metal', col: 13, row: 3, electron: '2,8,3', state: 'solid', discovery: '1825'},
+  {num: 14, symbol: 'Si', name: 'Silicon', mass: '28.09', type: 'metalloid', col: 14, row: 3, electron: '2,8,4', state: 'solid', discovery: '1824'},
+  {num: 15, symbol: 'P', name: 'Phosphorus', mass: '30.97', type: 'nonmetal', col: 15, row: 3, electron: '2,8,5', state: 'solid', discovery: '1669'},
+  {num: 16, symbol: 'S', name: 'Sulfur', mass: '32.07', type: 'nonmetal', col: 16, row: 3, electron: '2,8,6', state: 'solid', discovery: 'ancient'},
+  {num: 17, symbol: 'Cl', name: 'Chlorine', mass: '35.45', type: 'nonmetal', col: 17, row: 3, electron: '2,8,7', state: 'gas', discovery: '1774'},
+  {num: 18, symbol: 'Ar', name: 'Argon', mass: '39.95', type: 'noble', col: 18, row: 3, electron: '2,8,8', state: 'gas', discovery: '1894'},
+  {num: 19, symbol: 'K', name: 'Potassium', mass: '39.10', type: 'metal', col: 1, row: 4, electron: '2,8,8,1', state: 'solid', discovery: '1807'},
+  {num: 20, symbol: 'Ca', name: 'Calcium', mass: '40.08', type: 'metal', col: 2, row: 4, electron: '2,8,8,2', state: 'solid', discovery: '1808'},
+  {num: 21, symbol: 'Sc', name: 'Scandium', mass: '44.96', type: 'metal', col: 3, row: 4, electron: '2,8,9,2', state: 'solid', discovery: '1879'},
+  {num: 22, symbol: 'Ti', name: 'Titanium', mass: '47.87', type: 'metal', col: 4, row: 4, electron: '2,8,10,2', state: 'solid', discovery: '1791'},
+  {num: 23, symbol: 'V', name: 'Vanadium', mass: '50.94', type: 'metal', col: 5, row: 4, electron: '2,8,11,2', state: 'solid', discovery: '1801'},
+  {num: 24, symbol: 'Cr', name: 'Chromium', mass: '52.00', type: 'metal', col: 6, row: 4, electron: '2,8,13,1', state: 'solid', discovery: '1797'},
+  {num: 25, symbol: 'Mn', name: 'Manganese', mass: '54.94', type: 'metal', col: 7, row: 4, electron: '2,8,13,2', state: 'solid', discovery: '1774'},
+  {num: 26, symbol: 'Fe', name: 'Iron', mass: '55.85', type: 'metal', col: 8, row: 4, electron: '2,8,14,2', state: 'solid', discovery: 'ancient'},
+  {num: 27, symbol: 'Co', name: 'Cobalt', mass: '58.93', type: 'metal', col: 9, row: 4, electron: '2,8,15,2', state: 'solid', discovery: '1735'},
+  {num: 28, symbol: 'Ni', name: 'Nickel', mass: '58.69', type: 'metal', col: 10, row: 4, electron: '2,8,16,2', state: 'solid', discovery: '1751'},
+  {num: 29, symbol: 'Cu', name: 'Copper', mass: '63.55', type: 'metal', col: 11, row: 4, electron: '2,8,18,1', state: 'solid', discovery: 'ancient'},
+  {num: 30, symbol: 'Zn', name: 'Zinc', mass: '65.38', type: 'metal', col: 12, row: 4, electron: '2,8,18,2', state: 'solid', discovery: '1746'},
+  {num: 31, symbol: 'Ga', name: 'Gallium', mass: '69.72', type: 'metal', col: 13, row: 4, electron: '2,8,18,3', state: 'solid', discovery: '1875'},
+  {num: 32, symbol: 'Ge', name: 'Germanium', mass: '72.63', type: 'metalloid', col: 14, row: 4, electron: '2,8,18,4', state: 'solid', discovery: '1886'},
+  {num: 33, symbol: 'As', name: 'Arsenic', mass: '74.92', type: 'metalloid', col: 15, row: 4, electron: '2,8,18,5', state: 'solid', discovery: 'ancient'},
+  {num: 34, symbol: 'Se', name: 'Selenium', mass: '78.96', type: 'nonmetal', col: 16, row: 4, electron: '2,8,18,6', state: 'solid', discovery: '1817'},
+  {num: 35, symbol: 'Br', name: 'Bromine', mass: '79.90', type: 'nonmetal', col: 17, row: 4, electron: '2,8,18,7', state: 'liquid', discovery: '1826'},
+  {num: 36, symbol: 'Kr', name: 'Krypton', mass: '83.80', type: 'noble', col: 18, row: 4, electron: '2,8,18,8', state: 'gas', discovery: '1898'},
+  {num: 37, symbol: 'Rb', name: 'Rubidium', mass: '85.47', type: 'metal', col: 1, row: 5, electron: '2,8,18,8,1', state: 'solid', discovery: '1861'},
+  {num: 38, symbol: 'Sr', name: 'Strontium', mass: '87.62', type: 'metal', col: 2, row: 5, electron: '2,8,18,8,2', state: 'solid', discovery: '1790'},
+  {num: 39, symbol: 'Y', name: 'Yttrium', mass: '88.91', type: 'metal', col: 3, row: 5, electron: '2,8,18,9,2', state: 'solid', discovery: '1794'},
+  {num: 40, symbol: 'Zr', name: 'Zirconium', mass: '91.22', type: 'metal', col: 4, row: 5, electron: '2,8,18,10,2', state: 'solid', discovery: '1789'},
+  {num: 41, symbol: 'Nb', name: 'Niobium', mass: '92.91', type: 'metal', col: 5, row: 5, electron: '2,8,18,12,1', state: 'solid', discovery: '1801'},
+  {num: 42, symbol: 'Mo', name: 'Molybdenum', mass: '95.96', type: 'metal', col: 6, row: 5, electron: '2,8,18,13,1', state: 'solid', discovery: '1778'},
+  {num: 43, symbol: 'Tc', name: 'Technetium', mass: '98', type: 'metal', col: 7, row: 5, electron: '2,8,18,13,2', state: 'solid', discovery: '1937'},
+  {num: 44, symbol: 'Ru', name: 'Ruthenium', mass: '101.1', type: 'metal', col: 8, row: 5, electron: '2,8,18,15,1', state: 'solid', discovery: '1844'},
+  {num: 45, symbol: 'Rh', name: 'Rhodium', mass: '102.9', type: 'metal', col: 9, row: 5, electron: '2,8,18,16,1', state: 'solid', discovery: '1803'},
+  {num: 46, symbol: 'Pd', name: 'Palladium', mass: '106.4', type: 'metal', col: 10, row: 5, electron: '2,8,18,18', state: 'solid', discovery: '1803'},
+  {num: 47, symbol: 'Ag', name: 'Silver', mass: '107.9', type: 'metal', col: 11, row: 5, electron: '2,8,18,18,1', state: 'solid', discovery: 'ancient'},
+  {num: 48, symbol: 'Cd', name: 'Cadmium', mass: '112.4', type: 'metal', col: 12, row: 5, electron: '2,8,18,18,2', state: 'solid', discovery: '1817'},
+  {num: 49, symbol: 'In', name: 'Indium', mass: '114.8', type: 'metal', col: 13, row: 5, electron: '2,8,18,18,3', state: 'solid', discovery: '1863'},
+  {num: 50, symbol: 'Sn', name: 'Tin', mass: '118.7', type: 'metal', col: 14, row: 5, electron: '2,8,18,18,4', state: 'solid', discovery: 'ancient'},
+  {num: 51, symbol: 'Sb', name: 'Antimony', mass: '121.8', type: 'metalloid', col: 15, row: 5, electron: '2,8,18,18,5', state: 'solid', discovery: 'ancient'},
+  {num: 52, symbol: 'Te', name: 'Tellurium', mass: '127.6', type: 'metalloid', col: 16, row: 5, electron: '2,8,18,18,6', state: 'solid', discovery: '1783'},
+  {num: 53, symbol: 'I', name: 'Iodine', mass: '126.9', type: 'nonmetal', col: 17, row: 5, electron: '2,8,18,18,7', state: 'solid', discovery: '1811'},
+  {num: 54, symbol: 'Xe', name: 'Xenon', mass: '131.3', type: 'noble', col: 18, row: 5, electron: '2,8,18,18,8', state: 'gas', discovery: '1898'},
+  {num: 55, symbol: 'Cs', name: 'Cesium', mass: '132.9', type: 'metal', col: 1, row: 6, electron: '2,8,18,18,8,1', state: 'solid', discovery: '1860'},
+  {num: 56, symbol: 'Ba', name: 'Barium', mass: '137.3', type: 'metal', col: 2, row: 6, electron: '2,8,18,18,8,2', state: 'solid', discovery: '1808'},
+  {num: 57, symbol: 'La', name: 'Lanthanum', mass: '138.9', type: 'metal', col: 3, row: 6, electron: '2,8,18,18,9,2', state: 'solid', discovery: '1839'},
+  {num: 58, symbol: 'Ce', name: 'Cerium', mass: '140.1', type: 'metal', col: 4, row: 6, electron: '2,8,18,19,9,2', state: 'solid', discovery: '1803'},
+  {num: 59, symbol: 'Pr', name: 'Praseodymium', mass: '140.9', type: 'metal', col: 5, row: 6, electron: '2,8,18,21,8,2', state: 'solid', discovery: '1885'},
+  {num: 60, symbol: 'Nd', name: 'Neodymium', mass: '144.2', type: 'metal', col: 6, row: 6, electron: '2,8,18,22,8,2', state: 'solid', discovery: '1885'},
+  {num: 61, symbol: 'Pm', name: 'Promethium', mass: '145', type: 'metal', col: 7, row: 6, electron: '2,8,18,23,8,2', state: 'solid', discovery: '1945'},
+  {num: 62, symbol: 'Sm', name: 'Samarium', mass: '150.4', type: 'metal', col: 8, row: 6, electron: '2,8,18,24,8,2', state: 'solid', discovery: '1879'},
+  {num: 63, symbol: 'Eu', name: 'Europium', mass: '152.0', type: 'metal', col: 9, row: 6, electron: '2,8,18,25,8,2', state: 'solid', discovery: '1901'},
+  {num: 64, symbol: 'Gd', name: 'Gadolinium', mass: '157.3', type: 'metal', col: 10, row: 6, electron: '2,8,18,25,9,2', state: 'solid', discovery: '1880'},
+  {num: 65, symbol: 'Tb', name: 'Terbium', mass: '158.9', type: 'metal', col: 11, row: 6, electron: '2,8,18,27,8,2', state: 'solid', discovery: '1843'},
+  {num: 66, symbol: 'Dy', name: 'Dysprosium', mass: '162.5', type: 'metal', col: 12, row: 6, electron: '2,8,18,28,8,2', state: 'solid', discovery: '1886'},
+  {num: 67, symbol: 'Ho', name: 'Holmium', mass: '164.9', type: 'metal', col: 13, row: 6, electron: '2,8,18,29,8,2', state: 'solid', discovery: '1878'},
+  {num: 68, symbol: 'Er', name: 'Erbium', mass: '167.3', type: 'metal', col: 14, row: 6, electron: '2,8,18,30,8,2', state: 'solid', discovery: '1843'},
+  {num: 69, symbol: 'Tm', name: 'Thulium', mass: '168.9', type: 'metal', col: 15, row: 6, electron: '2,8,18,31,8,2', state: 'solid', discovery: '1879'},
+  {num: 70, symbol: 'Yb', name: 'Ytterbium', mass: '173.0', type: 'metal', col: 16, row: 6, electron: '2,8,18,32,8,2', state: 'solid', discovery: '1878'},
+  {num: 71, symbol: 'Lu', name: 'Lutetium', mass: '175.0', type: 'metal', col: 17, row: 6, electron: '2,8,18,32,9,2', state: 'solid', discovery: '1907'},
+  {num: 72, symbol: 'Hf', name: 'Hafnium', mass: '178.5', type: 'metal', col: 4, row: 6, electron: '2,8,18,32,10,2', state: 'solid', discovery: '1923'},
+  {num: 73, symbol: 'Ta', name: 'Tantalum', mass: '180.9', type: 'metal', col: 5, row: 6, electron: '2,8,18,32,11,2', state: 'solid', discovery: '1802'},
+  {num: 74, symbol: 'W', name: 'Tungsten', mass: '183.8', type: 'metal', col: 6, row: 6, electron: '2,8,18,32,12,2', state: 'solid', discovery: '1783'},
+  {num: 75, symbol: 'Re', name: 'Rhenium', mass: '186.2', type: 'metal', col: 7, row: 6, electron: '2,8,18,32,13,2', state: 'solid', discovery: '1925'},
+  {num: 76, symbol: 'Os', name: 'Osmium', mass: '190.2', type: 'metal', col: 8, row: 6, electron: '2,8,18,32,14,2', state: 'solid', discovery: '1803'},
+  {num: 77, symbol: 'Ir', name: 'Iridium', mass: '192.2', type: 'metal', col: 9, row: 6, electron: '2,8,18,32,15,2', state: 'solid', discovery: '1803'},
+  {num: 78, symbol: 'Pt', name: 'Platinum', mass: '195.1', type: 'metal', col: 10, row: 6, electron: '2,8,18,32,17,1', state: 'solid', discovery: '1735'},
+  {num: 79, symbol: 'Au', name: 'Gold', mass: '197.0', type: 'metal', col: 11, row: 6, electron: '2,8,18,32,18,1', state: 'solid', discovery: 'ancient'},
+  {num: 80, symbol: 'Hg', name: 'Mercury', mass: '200.6', type: 'metal', col: 12, row: 6, electron: '2,8,18,32,18,2', state: 'liquid', discovery: 'ancient'},
+  {num: 81, symbol: 'Tl', name: 'Thallium', mass: '204.4', type: 'metal', col: 13, row: 6, electron: '2,8,18,32,18,3', state: 'solid', discovery: '1861'},
+  {num: 82, symbol: 'Pb', name: 'Lead', mass: '207.2', type: 'metal', col: 14, row: 6, electron: '2,8,18,32,18,4', state: 'solid', discovery: 'ancient'},
+  {num: 83, symbol: 'Bi', name: 'Bismuth', mass: '209.0', type: 'metal', col: 15, row: 6, electron: '2,8,18,32,18,5', state: 'solid', discovery: '1753'},
+  {num: 84, symbol: 'Po', name: 'Polonium', mass: '209', type: 'metalloid', col: 16, row: 6, electron: '2,8,18,32,18,6', state: 'solid', discovery: '1898'},
+  {num: 85, symbol: 'At', name: 'Astatine', mass: '210', type: 'nonmetal', col: 17, row: 6, electron: '2,8,18,32,18,7', state: 'solid', discovery: '1940'},
+  {num: 86, symbol: 'Rn', name: 'Radon', mass: '222', type: 'noble', col: 18, row: 6, electron: '2,8,18,32,18,8', state: 'gas', discovery: '1900'},
+  {num: 87, symbol: 'Fr', name: 'Francium', mass: '223', type: 'metal', col: 1, row: 7, electron: '2,8,18,32,18,8,1', state: 'solid', discovery: '1939'},
+  {num: 88, symbol: 'Ra', name: 'Radium', mass: '226', type: 'metal', col: 2, row: 7, electron: '2,8,18,32,18,8,2', state: 'solid', discovery: '1898'},
+  {num: 89, symbol: 'Ac', name: 'Actinium', mass: '227', type: 'metal', col: 3, row: 7, electron: '2,8,18,32,18,9,2', state: 'solid', discovery: '1899'},
+  {num: 90, symbol: 'Th', name: 'Thorium', mass: '232.0', type: 'metal', col: 4, row: 7, electron: '2,8,18,32,18,10,2', state: 'solid', discovery: '1828'},
+  {num: 91, symbol: 'Pa', name: 'Protactinium', mass: '231.0', type: 'metal', col: 5, row: 7, electron: '2,8,18,32,20,9,2', state: 'solid', discovery: '1913'},
+  {num: 92, symbol: 'U', name: 'Uranium', mass: '238.0', type: 'metal', col: 6, row: 7, electron: '2,8,18,32,21,9,2', state: 'solid', discovery: '1789'},
+  {num: 93, symbol: 'Np', name: 'Neptunium', mass: '237', type: 'metal', col: 7, row: 7, electron: '2,8,18,32,22,9,2', state: 'solid', discovery: '1940'},
+  {num: 94, symbol: 'Pu', name: 'Plutonium', mass: '244', type: 'metal', col: 8, row: 7, electron: '2,8,18,32,24,8,2', state: 'solid', discovery: '1940'},
+  {num: 95, symbol: 'Am', name: 'Americium', mass: '243', type: 'metal', col: 9, row: 7, electron: '2,8,18,32,25,8,2', state: 'solid', discovery: '1944'},
+  {num: 96, symbol: 'Cm', name: 'Curium', mass: '247', type: 'metal', col: 10, row: 7, electron: '2,8,18,32,25,9,2', state: 'solid', discovery: '1944'},
+  {num: 97, symbol: 'Bk', name: 'Berkelium', mass: '247', type: 'metal', col: 11, row: 7, electron: '2,8,18,32,27,8,2', state: 'solid', discovery: '1949'},
+  {num: 98, symbol: 'Cf', name: 'Californium', mass: '251', type: 'metal', col: 12, row: 7, electron: '2,8,18,32,28,8,2', state: 'solid', discovery: '1950'},
+  {num: 99, symbol: 'Es', name: 'Einsteinium', mass: '252', type: 'metal', col: 13, row: 7, electron: '2,8,18,32,29,8,2', state: 'solid', discovery: '1952'},
+  {num: 100, symbol: 'Fm', name: 'Fermium', mass: '257', type: 'metal', col: 14, row: 7, electron: '2,8,18,32,30,8,2', state: 'solid', discovery: '1952'},
+  {num: 101, symbol: 'Md', name: 'Mendelevium', mass: '258', type: 'metal', col: 15, row: 7, electron: '2,8,18,32,31,8,2', state: 'solid', discovery: '1955'},
+  {num: 102, symbol: 'No', name: 'Nobelium', mass: '259', type: 'metal', col: 16, row: 7, electron: '2,8,18,32,32,8,2', state: 'solid', discovery: '1958'},
+  {num: 103, symbol: 'Lr', name: 'Lawrencium', mass: '262', type: 'metal', col: 17, row: 7, electron: '2,8,18,32,32,8,3', state: 'solid', discovery: '1961'},
+  {num: 104, symbol: 'Rf', name: 'Rutherfordium', mass: '267', type: 'metal', col: 4, row: 7, electron: '2,8,18,32,32,10,2', state: 'solid', discovery: '1969'},
+  {num: 105, symbol: 'Db', name: 'Dubnium', mass: '268', type: 'metal', col: 5, row: 7, electron: '2,8,18,32,32,11,2', state: 'solid', discovery: '1970'},
+  {num: 106, symbol: 'Sg', name: 'Seaborgium', mass: '271', type: 'metal', col: 6, row: 7, electron: '2,8,18,32,32,12,2', state: 'solid', discovery: '1974'},
+  {num: 107, symbol: 'Bh', name: 'Bohrium', mass: '272', type: 'metal', col: 7, row: 7, electron: '2,8,18,32,32,13,2', state: 'solid', discovery: '1981'},
+  {num: 108, symbol: 'Hs', name: 'Hassium', mass: '270', type: 'metal', col: 8, row: 7, electron: '2,8,18,32,32,14,2', state: 'solid', discovery: '1984'},
+  {num: 109, symbol: 'Mt', name: 'Meitnerium', mass: '276', type: 'metal', col: 9, row: 7, electron: '2,8,18,32,32,15,2', state: 'solid', discovery: '1982'},
+  {num: 110, symbol: 'Ds', name: 'Darmstadtium', mass: '281', type: 'metal', col: 10, row: 7, electron: '2,8,18,32,32,16,2', state: 'solid', discovery: '1994'},
+  {num: 111, symbol: 'Rg', name: 'Roentgenium', mass: '280', type: 'metal', col: 11, row: 7, electron: '2,8,18,32,32,17,2', state: 'solid', discovery: '1994'},
+  {num: 112, symbol: 'Cn', name: 'Copernicium', mass: '285', type: 'metal', col: 12, row: 7, electron: '2,8,18,32,32,18,2', state: 'solid', discovery: '1996'},
+  {num: 113, symbol: 'Nh', name: 'Nihonium', mass: '284', type: 'metal', col: 13, row: 7, electron: '2,8,18,32,32,18,3', state: 'solid', discovery: '2003'},
+  {num: 114, symbol: 'Fl', name: 'Flerovium', mass: '289', type: 'metal', col: 14, row: 7, electron: '2,8,18,32,32,18,4', state: 'solid', discovery: '1998'},
+  {num: 115, symbol: 'Mc', name: 'Moscovium', mass: '288', type: 'metal', col: 15, row: 7, electron: '2,8,18,32,32,18,5', state: 'solid', discovery: '2003'},
+  {num: 116, symbol: 'Lv', name: 'Livermorium', mass: '293', type: 'metal', col: 16, row: 7, electron: '2,8,18,32,32,18,6', state: 'solid', discovery: '2000'},
+  {num: 117, symbol: 'Ts', name: 'Tennessine', mass: '294', type: 'nonmetal', col: 17, row: 7, electron: '2,8,18,32,32,18,7', state: 'solid', discovery: '2010'},
+  {num: 118, symbol: 'Og', name: 'Oganesson', mass: '294', type: 'noble', col: 18, row: 7, electron: '2,8,18,32,32,18,8', state: 'gas', discovery: '2002'}
+];
+
+function createPeriodicTable() {
+  const table = document.getElementById('periodicTable');
+  const maxRow = 7;
+  const maxCol = 18;
+
+  for (let row = 1; row <= maxRow; row++) {
+    for (let col = 1; col <= maxCol; col++) {
+      const element = elements.find(e => e.row === row && e.col === col);
+
+      if (element) {
+        const div = document.createElement('div');
+        div.className = `element ${element.type}`;
+        div.style.gridColumn = col;
+        div.style.gridRow = row;
+        div.innerHTML = `
+          <div class="atomic-number">${element.num}</div>
+          <div class="symbol">${element.symbol}</div>
+          <div class="name">${element.name}</div>
+          <div class="atomic-mass">${element.mass}</div>
+        `;
+        div.onclick = () => showModal(element);
+        table.appendChild(div);
+      }
+    }
+  }
+
+  // Lanthanides
+  const lanthanidesContainer = document.querySelector('.lanthanides');
+  for (let i = 57; i <= 71; i++) {
+    const element = elements.find(e => e.num === i);
+    if (element) {
+      const div = document.createElement('div');
+      div.className = `element ${element.type}`;
+      div.innerHTML = `
+        <div class="atomic-number">${element.num}</div>
+        <div class="symbol">${element.symbol}</div>
+        <div class="name">${element.name}</div>
+        <div class="atomic-mass">${element.mass}</div>
+      `;
+      div.onclick = () => showModal(element);
+      lanthanidesContainer.appendChild(div);
+    }
+  }
+
+  // Actinides
+  const actinidesContainer = document.querySelector('.actinides');
+  for (let i = 89; i <= 103; i++) {
+    const element = elements.find(e => e.num === i);
+    if (element) {
+      const div = document.createElement('div');
+      div.className = `element ${element.type}`;
+      div.innerHTML = `
+        <div class="atomic-number">${element.num}</div>
+        <div class="symbol">${element.symbol}</div>
+        <div class="name">${element.name}</div>
+        <div class="atomic-mass">${element.mass}</div>
+      `;
+      div.onclick = () => showModal(element);
+      actinidesContainer.appendChild(div);
+    }
+  }
+}
+
+function showModal(element) {
+  const modal = document.getElementById('modal');
+  const overlay = document.getElementById('overlay');
+
+  document.getElementById('modalSymbol').textContent = element.symbol;
+  document.getElementById('modalName').textContent = element.name;
+  document.getElementById('modalNumber').textContent = `Atomic Number: ${element.num}`;
+
+  const typeNames = {
+    metal: 'Metal',
+    nonmetal: 'Non-metal',
+    metalloid: 'Metalloid',
+    noble: 'Noble Gas'
+  };
+
+  document.getElementById('modalInfo').innerHTML = `
+    <div class="info-item">
+      <div class="info-label">Atomic Mass</div>
+      <div class="info-value">${element.mass}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Type</div>
+      <div class="info-value">${typeNames[element.type]}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Electron Configuration</div>
+      <div class="info-value">${element.electron}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">State</div>
+      <div class="info-value">${element.state}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Discovery Year</div>
+      <div class="info-value">${element.discovery}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Position</div>
+      <div class="info-value">Group ${element.col}, Period ${element.row}</div>
+    </div>
+  `;
+
+  overlay.classList.add('active');
+  modal.classList.add('active');
+}
+
+function closeModal() {
+  const modal = document.getElementById('modal');
+  const overlay = document.getElementById('overlay');
+
+  modal.classList.remove('active');
+  overlay.classList.remove('active');
+}
+
+document.getElementById('overlay').onclick = closeModal;
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeModal();
+  }
+});
+
+createPeriodicTable();
+</script>
+</body>
+</html>
